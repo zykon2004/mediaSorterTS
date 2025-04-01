@@ -13,7 +13,7 @@ interface Configuration {
   mediaFileSuffixes: string[];
   defaultTitleSeparator: string;
   unifiedSeparator: string;
-  forbidden_characters: string[];
+  forbiddenCharacters: string[];
   torrentClientURL: string;
   torrentClientUsername: string;
   torrentClientPassword: string;
@@ -21,10 +21,10 @@ interface Configuration {
   forbiddenPrefixes: string[];
 }
 
-const client: RedisClientType = createClient({
-  url: "redis://192.168.1.99:6379/1",
-});
-async function connectAndGet() {
+async function loadConfig(): Promise<Configuration | undefined> {
+  const client: RedisClientType = createClient({
+    url: "redis://192.168.1.99:6379/1",
+  });
   try {
     await client.connect();
     const rawConfig = await client.hGetAll("media_sorter_config");
@@ -43,7 +43,7 @@ async function connectAndGet() {
       mediaFileSuffixes: rawConfig.media_files_suffixes?.split(" ") || [],
       defaultTitleSeparator: rawConfig.default_title_separator || "",
       unifiedSeparator: rawConfig.unified_separator || "",
-      forbidden_characters: rawConfig.forbidden_characters?.split(" ") || [],
+      forbiddenCharacters: rawConfig.forbidden_characters?.split(" ") || [],
       torrentClientURL: rawConfig.torrent_url || "",
       torrentClientUsername: rawConfig.torrent_username || "",
       torrentClientPassword: rawConfig.torrent_password || "",
@@ -53,14 +53,11 @@ async function connectAndGet() {
       })),
       forbiddenPrefixes: forbiddenPrefixes || [],
     };
-    console.log(config);
-
+    return config
   } catch (error) {
     console.error("Error:", error);
   } finally {
     await client.quit();
   }
 }
-
-// Execute the function
-connectAndGet();
+export const config = await loadConfig() as Configuration;

@@ -1,0 +1,16 @@
+HSET media_sorter_config movies_dir "/mnt/288EC2608EC225E2/Downloads/Movies/"
+HSET media_sorter_config downloads_dir "/mnt/288EC2608EC225E2/Downloads/"
+HSET media_sorter_config tv_shows_dir "/mnt/288EC2608EC225E2/Downloads/TVShows/"
+HSET media_sorter_config downloaded_media_indicators "720p 1080p 2160p"
+HSET media_sorter_config media_files_suffixes ".mkv .avi .mpeg .mpg"
+lpush media_sorter_config:tv_shows "The Wheel of Time tt7462410" "The Lord of the Rings The Rings of Power 2022" "The Last of Us 2023" "The Boys 2019" "Slow Horses 2022" "Silo tt14688458" "Shogun 2024" "Sherlock 2010" "Severance 2022" "Rick and Morty 2013" "House of The Dragon 2022" "HaMakor tt3011976" "Foundation 2021" "Fargo 2014" "Daredevil Born Again tt18923754" "Blue Eye Samurai 2023" "Arcane tt11126994"
+lpush media_sorter_config:forbidden_prefixes "www.UIndex.org    -   " "The"
+lrem media_sorter_config:forbidden_prefixes -1 "the"
+lrange media_sorter_config:forbidden_prefixes 0 -1
+
+
+HGETALL media_sorter_config
+keys media_sorter_config:tv_shows*
+
+lrange media_sorter_config:tv_shows 0 -1
+lpush media_sorter_config:forbidden_prefixes "the"
