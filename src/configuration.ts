@@ -1,4 +1,4 @@
-import { createClient, type RedisClientType } from "redis";
+import {createClient, type RedisClientType} from "redis";
 import * as path from "node:path";
 
 interface TVShow {
@@ -34,12 +34,12 @@ async function loadConfig(): Promise<Configuration | undefined> {
       -1,
     );
     const forbiddenPrefixes = await client.lRange("media_sorter_config:forbidden_prefixes", 0, -1);
-    const config: Configuration = {
+    return {
       tvShowDir: rawConfig.tv_shows_dir || "",
       moviesDir: rawConfig.movies_dir || "",
       downloadsDir: rawConfig.downloads_dir || "",
       downloadedMediaIndicators:
-        rawConfig.downloaded_media_indicators?.split(" ") || [],
+          rawConfig.downloaded_media_indicators?.split(" ") || [],
       mediaFileSuffixes: rawConfig.media_files_suffixes?.split(" ") || [],
       defaultTitleSeparator: rawConfig.default_title_separator || "",
       unifiedSeparator: rawConfig.unified_separator || "",
@@ -52,8 +52,7 @@ async function loadConfig(): Promise<Configuration | undefined> {
         path: path.join(rawConfig.tv_shows_dir || "", title),
       })),
       forbiddenPrefixes: forbiddenPrefixes || [],
-    };
-    return config
+    }
   } catch (error) {
     console.error("Error:", error);
   } finally {
