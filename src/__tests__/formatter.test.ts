@@ -1,13 +1,13 @@
 import { expect, test, describe, beforeEach, afterEach } from "bun:test";
 import type { AppConfig, TVShow } from "../AppConfig.ts";
-import {Formatter} from "../formatter.ts";
+import { Formatter, SeasonEpisodePatternNotFound } from "../formatter.ts";
 const testConfig: AppConfig = {
   tvShowDir: "",
   moviesDir: "",
   downloadsDir: "",
   downloadedMediaIndicators: [],
   mediaFileSuffixes: [],
-  defaultTitleSeparator: "",
+  defaultTitleSeparator: " ",
   unifiedSeparator: ".",
   forbiddenCharacters: [";", ":"],
   torrentClientURL: "",
@@ -57,5 +57,78 @@ describe("formatSeriesTitleAndFileName", () => {
     ],
   ])('%s: formats "%s" to "%s"', (testId, title, formattedTitle) => {
     expect(formatter.formatSeriesTitleAndFileName(title)).toBe(formattedTitle);
+  });
+});
+describe("formatSeriesFilenameBeforeRename", () => {
+  test.each([
+    [
+      "Normal case. prefix deleted, capitalized, episode and season extracted",
+      "The.Mandalorian.S02E02.Chapter.10.1080p.DSNP.WEB-DL.DDP.5.1.Atmos.H.264-PHOENiX.mkv",
+      "The Mandalorian 2018",
+      "Mandalorian - 02x02.mkv",
+    ],
+    [
+      "avi file, dots in name",
+      "S.W.A.T.2017.S07E10.1080p_HDTV_;;x265-MiNX[TGx].avi",
+      "S.W.A.T 2017",
+      "S.W.A.T - 07x10.avi",
+    ],
+  ])(
+    '%s: formats "%s", "%s" to "%s"',
+    (testId, filename, title, expectedFilename) => {
+      expect(formatter.formatSeriesFilenameBeforeRename(filename, title)).toBe(
+        expectedFilename,
+      );
+    },
+  );
+});
+
+describe("formatSeriesFilenameBeforeRename exception handling", () => {
+  test.each([
+    [
+      "No exception is raised. season, episode format found",
+      "The.Mandalorian.S02E02.Chapter.10.1080p.DSNP.WEB-DL.DDP.5.1.Atmos.H.264-PHOENiX.mkv",
+      "The Mandalorian 2018",
+      false,
+    ],
+    [
+      "Did not found SXXEYY pattern, should throw SeasonEpisodePatternNotFound",
+      "S.W.A.T 2017",
+      "S.W.A.T 2017",
+      true,
+    ],
+  ])("$id", (testId, filename, title, shouldThrow) => {
+    const testFn = () => {
+      formatter.formatSeriesFilenameBeforeRename(filename, title);
+    };
+
+    if (shouldThrow) {
+      expect(testFn).toThrow(SeasonEpisodePatternNotFound);
+      // Optionally, check the error message
+      expect(testFn).toThrow(`Didn't find SXXEYY pattern in ${filename}`);
+    } else {
+      // Expecting no exception
+      expect(testFn).not.toThrow();
+    }
+  });
+});
+describe("E2E Format Series Title and Filename", () => {
+  test.each([
+    [
+      "mismatched title and filename",
+      "The Office tt0386676",
+      "The.Mandalorian.S02E02.Chapter.10.1080p.DSNP.WEB-DL.DDP.5.1.Atmos.H.264-PHOENiX.mkv",
+      false,
+    ],
+    [
+      "matching title and filename, removing `the`, removing suffix",
+      "Mandalorian 2018",
+      "The.Mandalorian.S02E02.Chapter.10.1080p.DSNP.WEB-DL.DDP.5.1.Atmos.H.264-PHOENiX.mkv",
+      true,
+    ],
+  ])("$id", (testId, title, filename, expectedResult ) => {
+    const formattedTitle = formatter.formatSeriesTitleAndFileName(title);
+    const formattedFilename = formatter.formatSeriesTitleAndFileName(filename);
+    expect(formattedFilename.startsWith(formattedTitle)).toBe(expectedResult);
   });
 });
