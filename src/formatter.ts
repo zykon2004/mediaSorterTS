@@ -1,38 +1,67 @@
-import { config } from "configuration";
+import { log } from "console";
+import type { AppConfig } from "./AppConfig.ts";
 
-export function formatSeriesTitleAndFileName(title: string): string {
-  let formattedTitle = title.toLowerCase();
-  formattedTitle = createUnifiedSeparator(formattedTitle);
-  formattedTitle = removeForbiddenPrefixes(formattedTitle, config.forbiddenPrefixes, config.unifiedSeparator);
-  formattedTitle = removeYearAndImdbSuffix(formattedTitle);
-  return removeForbiddenCharacters(formattedTitle, config.forbiddenCharacters, config.unifiedSeparator);
-}
-
-function createUnifiedSeparator(formattedTitle: string): string {
-  formattedTitle.replace(" ", config.unifiedSeparator);
-  formattedTitle.replace("_", config.unifiedSeparator);
-  return formattedTitle;
-}
-
-function removeYearAndImdbSuffix(formattedTitle: string): string {
-  throw new Error("Function not implemented.");
-}
-
-export function removeForbiddenCharacters(formattedTitle: string, forbiddenCharacters: string[], unifiedSeparator: string): string {
-  for (let char of forbiddenCharacters) {
-    formattedTitle = formattedTitle.replace(char, "");
+export class Formatter {
+  private config: AppConfig;
+  escapeRegExp = (str: string) => str.replace(/[.*+?^=!:${}()|[\]\/\\]/g, '\\$&');
+  private separator: string;
+  private escapedSeparator: string;
+  constructor(config: AppConfig) {
+    this.config = config;
+    this.separator = this.config.unifiedSeparator;
+    this.escapedSeparator = this.escapeRegExp(this.separator);
   }
-  const leadingSeparatorRegex = new RegExp(`^${unifiedSeparator}+`);
-  const trailingSeparatorRegex = new RegExp(`${unifiedSeparator}+$`);
-  return formattedTitle.replace(leadingSeparatorRegex, '').replace(trailingSeparatorRegex, '');
-}
 
-export function removeForbiddenPrefixes(formattedTitle: string, forbiddenPrefixes: string[], unifiedSeparator: string): string {
-  for (let prefix of forbiddenPrefixes) {
-    prefix = createUnifiedSeparator(prefix);
-    const prefixToRemoveRegex = new RegExp(`^${prefix}${unifiedSeparator}*`, "i");
-    formattedTitle = formattedTitle.replace(prefixToRemoveRegex, "");
+  formatSeriesTitleAndFileName(title: string): string {
+    let formattedTitle = title.toLowerCase();
+    formattedTitle = this.createUnifiedSeparator(formattedTitle);
+    formattedTitle = this.removeForbiddenPrefixes(formattedTitle);
+    formattedTitle = this.removeYearAndImdbSuffix(formattedTitle);
+    formattedTitle = this.removeForbiddenCharacters(formattedTitle);
+    return formattedTitle;
   }
-  const thePrefixToRemoveRegex = new RegExp(`^The${unifiedSeparator}*`, "i");
-  return formattedTitle.replace(thePrefixToRemoveRegex, "");
+
+  private createUnifiedSeparator(formattedTitle: string): string {
+    return formattedTitle.replace(/(_| )/g, this.separator);
+
+  }
+
+  private removeForbiddenPrefixes(formattedTitle: string): string {
+    for (let prefix of this.config.forbiddenPrefixes) {
+      prefix = this.createUnifiedSeparator(prefix);
+      const prefixToRemoveRegex = new RegExp( `^${prefix}${this.escapedSeparator}*`, "i",
+      );
+      formattedTitle = formattedTitle.replace(prefixToRemoveRegex, "");
+    }
+    const thePrefixToRemoveRegex = new RegExp( `^The${this.escapedSeparator}*`, "i",);
+    return formattedTitle.replace(thePrefixToRemoveRegex, "");
+  }
+  private removeYearAndImdbSuffix(formattedTitle: string): string {
+    const titleSuffix = formattedTitle.split(this.separator).at(-1);
+    if (titleSuffix === formattedTitle) {
+      throw Error("Title does not contain a suffix");
+    }
+    if (titleSuffix?.match(/^(tt\d+|\d{4})$/)) {
+      return formattedTitle.replace(
+        new RegExp(`${this.escapedSeparator}${titleSuffix}$`),
+        "",
+      );
+    }
+    return formattedTitle;
+  }
+
+  private removeForbiddenCharacters(formattedTitle: string): string {
+    for (let char of this.config.forbiddenCharacters) {
+      formattedTitle = formattedTitle.replace(new RegExp(char, "g"), "");
+    }
+    const leadingSeparatorRegex = new RegExp(
+      `^${this.escapedSeparator}+`,
+    );
+    const trailingSeparatorRegex = new RegExp(
+      `${this.escapedSeparator}+$`,
+    );
+    return formattedTitle
+      .replace(leadingSeparatorRegex, "")
+      .replace(trailingSeparatorRegex, "");
+  }
 }
