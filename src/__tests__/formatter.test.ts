@@ -1,5 +1,5 @@
-import { expect, test, describe, beforeEach, afterEach } from "bun:test";
-import type { AppConfig, TVShow } from "../AppConfig.ts";
+import { expect, test, describe } from "bun:test";
+import type { AppConfig } from "../AppConfig.ts";
 import { Formatter, SeasonEpisodePatternNotFound } from "../formatter.ts";
 const testConfig: AppConfig = {
   tvShowDir: "",
@@ -126,7 +126,7 @@ describe("E2E Format Series Title and Filename", () => {
       "The.Mandalorian.S02E02.Chapter.10.1080p.DSNP.WEB-DL.DDP.5.1.Atmos.H.264-PHOENiX.mkv",
       true,
     ],
-  ])("$id", (testId, title, filename, expectedResult ) => {
+  ])("$id", (testId, title, filename, expectedResult) => {
     const formattedTitle = formatter.formatSeriesTitleAndFileName(title);
     const formattedFilename = formatter.formatSeriesTitleAndFileName(filename);
     expect(formattedFilename.startsWith(formattedTitle)).toBe(expectedResult);

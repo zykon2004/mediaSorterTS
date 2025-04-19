@@ -77,7 +77,7 @@ export class Formatter {
    * @returns A tuple containing the season (two digits) and episode (two digits) as strings.
    * @throws SeasonEpisodePatternNotFound if the expected pattern is not found.
    */
-  private extractSeasonAndEpisodeFromSeriesFilename(
+  extractSeasonAndEpisodeFromSeriesFilename(
     filename: string,
   ): [string, string] {
     const seriesSeasonAndEpisodeRegex = /s(\d{2})e(\d{2})/i;
