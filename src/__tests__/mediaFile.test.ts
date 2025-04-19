@@ -12,12 +12,12 @@ describe("isDownloadedMediaFile", () => {
   test.each<[string, string, boolean]>([
     [
       `A file ending with .mkv and contains ${downloadedMediaIndicator}`,
-      `The.Mandalorian.S02E02.Chapter.10.${downloadedMediaIndicator}.WEB-DL.DDP.5.1.Atmos.H.264-PHOENiX${mediaFileSuffix}`,
+      `The.Mandalorian.S02E02.Chapter.10.${downloadedMediaIndicator}.WEB-DL.DDP.5.1.Atmos.H.264-PHOENIX${mediaFileSuffix}`,
       true,
     ],
     [
       "Contains downloaded media pattern but is not a file",
-      `The.Mandalorian.S02E02.Chapter.10.${downloadedMediaIndicator}.DSNP.WEB-DL.DDP.5.1.Atmos.H.264-PHOENiX`,
+      `The.Mandalorian.S02E02.Chapter.10.${downloadedMediaIndicator}.ASP.WEB-DL.DDP.5.1.Atmos.H.264-PHOENIX`,
       false,
     ],
     [
@@ -25,7 +25,7 @@ describe("isDownloadedMediaFile", () => {
       `Our Wedding 2019${mediaFileSuffix}`,
       false,
     ],
-  ])("%s", (testId: string, filename: string, expectedResult: boolean) => {
+  ])("%s", (_testId: string, filename: string, expectedResult: boolean) => {
     expect(mediaFile.isDownloadedMediaFile(filename)).toBe(expectedResult);
   });
 });
@@ -39,10 +39,10 @@ describe("isDownloadedMediaDirectory", () => {
   let downloadedMediaFilePath: string;
 
   beforeAll(() => {
-    const tempDirPrefix = path.join(os.tmpdir(), "mediafile-test-");
+    const tempDirPrefix = path.join(os.tmpdir(), "mediaFile-test-");
     tempTestDir = fs.mkdtempSync(tempDirPrefix);
     // Counts as a series directory
-    const downloadedMediaDirectory = `The.Mandalorian.S02E02.Chapter.10.${downloadedMediaIndicator}.WEB-DL.DDP.5.1.Atmos.H.264-PHOENiX`;
+    const downloadedMediaDirectory = `The.Mandalorian.S02E02.Chapter.10.${downloadedMediaIndicator}.WEB-DL.DDP.5.1.Atmos.H.264-PHOENIX`;
     mandalorianDirectoryPath = path.join(
       tempTestDir,
       config.downloadsDir,
@@ -132,17 +132,17 @@ describe("isSeriesFile", () => {
   test.each<[string, string, boolean]>([
     [
       "A file downloaded file containing s02e02 pattern",
-      `The.Mandalorian.S02E02.Chapter.10.${downloadedMediaIndicator}.WEB-DL.DDP.5.1.Atmos.H.264-PHOENiX${mediaFileSuffix}`,
+      `The.Mandalorian.S02E02.Chapter.10.${downloadedMediaIndicator}.WEB-DL.DDP.5.1.Atmos.H.264-PHOENIX${mediaFileSuffix}`,
       true,
     ],
     [
       "Downloaded media, but not a series",
-      `The.Ministry.of.Ungentlemanly.Warfare.2024.${downloadedMediaIndicator}.AMZN.WEBRip.1400MB-GalaxyRG${mediaFileSuffix}`,
+      `The.Ministry.of.Ungentlemanly.Warfare.2024.${downloadedMediaIndicator}.AMAZON.WEBRip.1400MB-GalaxyRG${mediaFileSuffix}`,
       false,
     ],
     ["Not a media file", "1.jpeg", false],
     ["Not a downloaded file", `Our Wedding 2019${mediaFileSuffix}`, false],
-  ])("%s", (testId: string, filename: string, expectedResult: boolean) => {
+  ])("%s", (_testId: string, filename: string, expectedResult: boolean) => {
     // Configure the test with proper media indicators and suffixes
     expect(mediaFile.isSeriesFile(filename)).toBe(expectedResult);
   });
