@@ -1,7 +1,6 @@
-import {Formatter, SeasonEpisodePatternNotFound} from "../formatter.ts";
-import {testConfig} from "./testConfig.ts";
+import {SeasonEpisodePatternNotFound} from "../formatter.ts";
+import {formatter} from "./fixtures.ts";
 
-const formatter = new Formatter(testConfig);
 describe("formatSeriesTitleAndFileName", () => {
   test.each([
     ["number is not removed since it is not a year", "Catch 22", "catch.22"],

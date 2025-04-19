@@ -33,9 +33,9 @@ export class MediaFile {
       return false;
     }
 
-    const hasDownloadedIndicator = this.isDownloaded(path.dirname(directory));
+    const hasDownloadedIndicator = this.isDownloaded(path.basename(directory));
     const containsMediaFiles = fs.readdirSync(directory).some((file) => {
-      fs.statSync(file).isFile() && this.isMediaFile(file)
+      return fs.statSync(path.join(directory, file)).isFile() && this.isMediaFile(file)
     });
 
     return hasDownloadedIndicator && containsMediaFiles;
