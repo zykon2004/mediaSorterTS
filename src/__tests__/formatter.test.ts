@@ -1,5 +1,5 @@
-import {SeasonEpisodePatternNotFound} from "../formatter.ts";
-import {formatter} from "./fixtures.ts";
+import { SeasonEpisodePatternNotFound } from "../formatter.ts";
+import { formatter } from "./fixtures.ts";
 
 describe("formatSeriesTitleAndFileName", () => {
   test.each([

@@ -118,14 +118,14 @@ describe("isDownloadedMediaDirectory", () => {
     );
   });
   test("downloaded app directory is not recognized as downloaded media directory", () => {
-    expect(mediaFile.isDownloadedMediaDirectory(appDirectoryPath)).toBe(
-      false,
-    );
+    expect(mediaFile.isDownloadedMediaDirectory(appDirectoryPath)).toBe(false);
   });
 
   test("personal media folder is not recognized as downloaded media", () => {
-    expect(mediaFile.isDownloadedMediaDirectory(personalMediaDirectoryPath)).toBe(false);
-  })
+    expect(
+      mediaFile.isDownloadedMediaDirectory(personalMediaDirectoryPath),
+    ).toBe(false);
+  });
 });
 
 describe("isSeriesFile", () => {
