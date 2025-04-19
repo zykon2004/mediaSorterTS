@@ -1,4 +1,3 @@
-import { log } from "console";
 import type { AppConfig } from "./AppConfig.ts";
 
 export class Formatter {

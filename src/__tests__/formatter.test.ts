@@ -1,21 +1,6 @@
-import { expect, test, describe } from "bun:test";
-import type { AppConfig } from "../AppConfig.ts";
-import { Formatter, SeasonEpisodePatternNotFound } from "../formatter.ts";
-const testConfig: AppConfig = {
-  tvShowDir: "",
-  moviesDir: "",
-  downloadsDir: "",
-  downloadedMediaIndicators: [],
-  mediaFileSuffixes: [],
-  defaultTitleSeparator: " ",
-  unifiedSeparator: ".",
-  forbiddenCharacters: [";", ":"],
-  torrentClientURL: "",
-  torrentClientUsername: "",
-  torrentClientPassword: "",
-  tvShows: [],
-  forbiddenPrefixes: ["www.UIndex.org    -    ", "www.Torrenting.com - "],
-};
+import {Formatter, SeasonEpisodePatternNotFound} from "../formatter.ts";
+import {testConfig} from "./testConfig.ts";
+
 const formatter = new Formatter(testConfig);
 describe("formatSeriesTitleAndFileName", () => {
   test.each([
