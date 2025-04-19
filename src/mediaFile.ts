@@ -4,12 +4,14 @@ import path from "path";
 import fs from "fs";
 
 export class MediaFile {
-  private readonly config: AppConfig;
+  private readonly downloadedMediaIndicators: string[];
+  private readonly mediaFileSuffixes: string[];
   private readonly formatter: Formatter;
 
-  constructor(config: AppConfig) {
-    this.config = config;
-    this.formatter = new Formatter(config);
+  constructor(config: AppConfig, formatter: Formatter) {
+    this.downloadedMediaIndicators = config.downloadedMediaIndicators;
+    this.mediaFileSuffixes = config.mediaFileSuffixes;
+    this.formatter = formatter;
   }
 
   isDownloadedMediaFile(file: string): boolean {
@@ -18,14 +20,14 @@ export class MediaFile {
   }
 
   private isDownloaded(filename: string): boolean {
-    return this.config.downloadedMediaIndicators.some((indicator) =>
+    return this.downloadedMediaIndicators.some((indicator) =>
       filename.includes(indicator),
     );
   }
 
   private isMediaFile(filename: string): boolean {
     const suffix = filename.split(".").pop() || "";
-    return this.config.mediaFileSuffixes.includes(`.${suffix}`);
+    return this.mediaFileSuffixes.includes(`.${suffix}`);
   }
 
   isDownloadedMediaDirectory(directory: string): boolean {

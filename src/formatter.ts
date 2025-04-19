@@ -1,15 +1,20 @@
 import type { AppConfig } from "./AppConfig.ts";
 
 export class Formatter {
-  private config: AppConfig;
   escapeRegExp = (str: string) =>
     str.replace(/[.*+?^=!:${}()|[\]\/\\]/g, "\\$&");
   private readonly separator: string;
   private readonly escapedSeparator: string;
+  private readonly defaultTitleSeparator: string;
+  private readonly forbiddenPrefixes: string[];
+  private readonly forbiddenCharacters: string[];
+
   constructor(config: AppConfig) {
-    this.config = config;
-    this.config.forbiddenPrefixes.push("The");
-    this.separator = this.config.unifiedSeparator;
+    this.forbiddenPrefixes = config.forbiddenPrefixes;
+    this.forbiddenPrefixes.push("The");
+    this.forbiddenCharacters = config.forbiddenCharacters;
+    this.defaultTitleSeparator = config.defaultTitleSeparator;
+    this.separator = config.unifiedSeparator;
     this.escapedSeparator = this.escapeRegExp(this.separator);
   }
 
@@ -29,7 +34,7 @@ export class Formatter {
   }
 
   private removeForbiddenPrefixes(formattedTitle: string): string {
-    for (let prefix of this.config.forbiddenPrefixes) {
+    for (let prefix of this.forbiddenPrefixes) {
       prefix = this.createUnifiedSeparator(prefix);
       const prefixToRemoveRegex = new RegExp(
         `^${prefix}[${this.escapedSeparator} ]*`,
@@ -59,7 +64,7 @@ export class Formatter {
   }
 
   private removeForbiddenCharacters(formattedTitle: string): string {
-    for (let char of this.config.forbiddenCharacters) {
+    for (let char of this.forbiddenCharacters) {
       formattedTitle = formattedTitle.replaceAll(char, "");
     }
     const leadingSeparatorRegex = new RegExp(`^${this.escapedSeparator}+`);
@@ -95,7 +100,7 @@ export class Formatter {
       this.extractSeasonAndEpisodeFromSeriesFilename(filename);
     let formatedTitle = this.removeYearAndImdbSuffix(
       title,
-      this.config.defaultTitleSeparator,
+      this.defaultTitleSeparator,
     );
     formatedTitle = this.removeForbiddenPrefixes(formatedTitle);
     return `${formatedTitle} - ${season}x${episode}.${filename.split(".").at(-1)}`;

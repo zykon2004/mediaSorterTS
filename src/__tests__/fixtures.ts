@@ -18,7 +18,8 @@ export const config: AppConfig = {
   forbiddenPrefixes: ["www.UIndex.org    -    ", "www.Torrenting.com - "],
 };
 export const formatter = new Formatter(config);
-export const mediaFile = new MediaFile(config);
-export const downloadedMediaIndicator = config.downloadedMediaIndicators[0];
-export const mediaFileSuffix = config.mediaFileSuffixes[0];
+export const mediaFile = new MediaFile(config, formatter);
+export const downloadedMediaIndicator = config
+  .downloadedMediaIndicators[0] as string;
+export const mediaFileSuffix = config.mediaFileSuffixes[0] as string;
 test("load fixtures", () => expect(true).toBe(true));
