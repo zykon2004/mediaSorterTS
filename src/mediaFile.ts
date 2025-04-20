@@ -4,15 +4,11 @@ import path from "path";
 import fs from "fs";
 
 export class MediaFile {
-  private readonly downloadedMediaIndicators: string[];
-  private readonly mediaFileSuffixes: string[];
-  private readonly formatter: Formatter;
-
-  constructor(config: AppConfig, formatter: Formatter) {
-    this.downloadedMediaIndicators = config.downloadedMediaIndicators;
-    this.mediaFileSuffixes = config.mediaFileSuffixes;
-    this.formatter = formatter;
-  }
+  constructor(
+    private readonly downloadedMediaIndicators: string[],
+    private readonly mediaFileSuffixes: string[],
+    private readonly formatter: Formatter
+  ) {}
 
   isDownloadedMediaFile(file: string): boolean {
     const filename = path.basename(file);

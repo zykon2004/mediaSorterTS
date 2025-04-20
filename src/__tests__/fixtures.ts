@@ -17,8 +17,17 @@ export const config: AppConfig = {
   tvShows: [],
   forbiddenPrefixes: ["www.UIndex.org    -    ", "www.Torrenting.com - "],
 };
-export const formatter = new Formatter(config);
-export const mediaFile = new MediaFile(config, formatter);
+export const formatter = new Formatter(
+  config.forbiddenPrefixes,
+  config.forbiddenCharacters,
+  config.defaultTitleSeparator,
+  config.unifiedSeparator
+);
+export const mediaFile = new MediaFile(
+  config.downloadedMediaIndicators,
+  config.mediaFileSuffixes,
+  formatter
+);
 export const downloadedMediaIndicator = config
   .downloadedMediaIndicators[0] as string;
 export const mediaFileSuffix = config.mediaFileSuffixes[0] as string;

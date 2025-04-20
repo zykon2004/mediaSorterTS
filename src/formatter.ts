@@ -3,18 +3,15 @@ import type { AppConfig } from "./AppConfig.ts";
 export class Formatter {
   escapeRegExp = (str: string) =>
     str.replace(/[.*+?^=!:${}()|[\]\/\\]/g, "\\$&");
-  private readonly separator: string;
   private readonly escapedSeparator: string;
-  private readonly defaultTitleSeparator: string;
-  private readonly forbiddenPrefixes: string[];
-  private readonly forbiddenCharacters: string[];
 
-  constructor(config: AppConfig) {
-    this.forbiddenPrefixes = config.forbiddenPrefixes;
+  constructor(
+    private readonly forbiddenPrefixes: string[],
+    private readonly forbiddenCharacters: string[],
+    private readonly defaultTitleSeparator: string,
+    private readonly separator: string
+  ) {
     this.forbiddenPrefixes.push("The");
-    this.forbiddenCharacters = config.forbiddenCharacters;
-    this.defaultTitleSeparator = config.defaultTitleSeparator;
-    this.separator = config.unifiedSeparator;
     this.escapedSeparator = this.escapeRegExp(this.separator);
   }
 
