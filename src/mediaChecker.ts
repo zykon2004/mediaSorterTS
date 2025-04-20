@@ -3,7 +3,7 @@ import { Formatter, SeasonEpisodePatternNotFound } from "./formatter";
 import path from "path";
 import fs from "fs";
 
-export class MediaFile {
+export class MediaChecker {
   constructor(
     private readonly downloadedMediaIndicators: string[],
     private readonly mediaFileSuffixes: string[],

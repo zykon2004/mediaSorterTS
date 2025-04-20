@@ -1,6 +1,6 @@
 import type { AppConfig } from "../AppConfig.ts";
 import { Formatter } from "../formatter.ts";
-import { MediaFile } from "../mediaFile.ts";
+import { MediaChecker } from "../mediaChecker.ts";
 
 export const config: AppConfig = {
   tvShowDir: "TVShows",
@@ -23,7 +23,7 @@ export const formatter = new Formatter(
   config.defaultTitleSeparator,
   config.unifiedSeparator
 );
-export const mediaFile = new MediaFile(
+export const mediaFile = new MediaChecker(
   config.downloadedMediaIndicators,
   config.mediaFileSuffixes,
   formatter
