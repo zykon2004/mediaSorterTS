@@ -2,10 +2,7 @@ import * as log4js from 'log4js';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Define the logs directory path
 const logsDir = path.join(process.cwd(), 'logs');
-
-// Create logs directory if it doesn't exist
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
 }
@@ -39,13 +36,9 @@ log4js.configure({
   }
 });
 
-// Get the logger
 const logger = log4js.getLogger();
-
-// Export the logger
 export default logger;
 
-// Helper function to shutdown logger (useful for clean app termination)
 export const shutdownLogger = (): Promise<void> => {
   return new Promise((resolve) => {
     log4js.shutdown(() => {
