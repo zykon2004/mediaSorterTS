@@ -6,12 +6,12 @@ import path from "path";
 import { Formatter } from "./formatter.ts";
 
 export class Sorter {
-  mediaFiles: Set<string>;
-  mediaDirectories: Set<string>;
-  assignedFiles: Set<string>;
-  assignedDirectories: Set<string>;
-  movedSeriesMediaCount: number;
-  movedMovieMediaCount: number;
+  mediaFiles: Set<string> = new Set<string>();
+  mediaDirectories: Set<string> = new Set<string>();
+  assignedFiles: Set<string> = new Set<string>();
+  assignedDirectories: Set<string> = new Set<string>();
+  movedSeriesMediaCount: number = 0;
+  movedMovieMediaCount: number = 0;
 
   constructor(
     readonly DownloadsDirectory: string,
@@ -20,42 +20,38 @@ export class Sorter {
     readonly formatter: Formatter,
     readonly seriesParentDirectories: ParentDirectory[],
   ) {
-    this.mediaDirectories = new Set();
-    this.mediaFiles = new Set();
     fs.readdirSync(this.DownloadsDirectory).forEach((fileOrDirectory) => {
       if (this.mediaChecker.isDownloadedMediaFile(fileOrDirectory))
         this.mediaFiles.add(fileOrDirectory);
       else if (this.mediaChecker.isDownloadedMediaDirectory(fileOrDirectory))
         this.mediaDirectories.add(fileOrDirectory);
     });
-
-    this.assignedFiles = new Set();
-    this.assignedDirectories = new Set();
-    this.movedSeriesMediaCount = 0;
-    this.movedMovieMediaCount = 0;
   }
   public sort(): void {
-      this.assignAllMediaToParents();
-      if (this.assignedDirectories.union(this.assignedFiles).size === 0) {
-          logger.info("Nothing to assign");
+    this.assignAllMediaToParents();
+    if (this.assignedDirectories.union(this.assignedFiles).size === 0) {
+      logger.info("Nothing to assign");
+    }
+    this.moveAllMediaToAssignedParents();
+    this.moveUnassignedMediaToMovies();
+    this.cleanupEmptyDirectories();
+  }
+  private assignAllMediaToParents(): void {
+    this.seriesParentDirectories.forEach((parentDirectory) => {
+      this.assignFilesToParents(parentDirectory);
+      this.assignDirectoriesToParents(parentDirectory);
+    });
+  }
+  private assignFilesToParents(parentDirectory: ParentDirectory) {
+    this.mediaFiles.forEach((file) => {
+      const formattedFileName = this.formatter.formatSeriesTitleAndFileName(
+        path.basename(file),
+      );
+      if (formattedFileName.startsWith(parentDirectory.comparableName)) {
+        parentDirectory.assignFile(file);
+        this.assignedFiles.add(file);
       }
-      this.moveAllMediaToAssignedParents();
-      this.moveUnassignedMediaToMovies();
-      this.cleanupEmptyDirectories();
-  }
-  private assignAllMediaToParents():void {
-      this.seriesParentDirectories.forEach((parentDirectory)=> {
-          this.assignFilesToParents(parentDirectory);
-          this.assignDirectoriesToParents(parentDirectory);
-      })
-  }
-  private assignFilesToParents(parentDirectory:ParentDirectory) {
-      this.mediaFiles.forEach((file) => {
-          const formattedFileName = this.formatter.formatSeriesTitleAndFileName(path.basename(file));
-          if (formattedFileName.startsWith(parentDirectory.comparableName)){
-              parentDirectory.assignFile(file);
-              this.assignedFiles.add(file);
-          }})
+    });
   }
 
   /**

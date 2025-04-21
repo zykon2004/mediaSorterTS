@@ -3,14 +3,13 @@ import path from "path";
 import { TVShow } from "./AppConfig.ts";
 
 export class ParentDirectory {
-  public newlyAssignedFiles: Set<string>;
+  public newlyAssignedFiles: Set<string> = new Set();
   readonly comparableName: string;
 
   constructor(
     readonly directoryPath: string,
     readonly formatter: Formatter,
   ) {
-    this.newlyAssignedFiles = new Set();
     this.comparableName = this.formatter.formatSeriesTitleAndFileName(
       path.basename(this.directoryPath),
     );
