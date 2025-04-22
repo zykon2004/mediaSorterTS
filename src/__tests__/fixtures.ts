@@ -4,6 +4,7 @@ import { Formatter } from "../formatter.ts";
 import { MediaChecker } from "../mediaChecker.ts";
 import path from "path";
 import { createParentTvShowDirectories } from "../parentDirectory.ts";
+
 const rawTVShows = ["The Mandalorian tt8111088", "Game of Thrones 2011"];
 const tvShowDir = "TVShows";
 export const config: AppConfig = {
@@ -38,16 +39,9 @@ export const mediaChecker = new MediaChecker(
 export const downloadedMediaIndicator = config
   .downloadedMediaIndicators[0] as string;
 export const mediaFileSuffix = config.mediaFileSuffixes[0] as string;
-const parentDirectories = createParentTvShowDirectories(
+export const parentDirectories = createParentTvShowDirectories(
   config.tvShowDir,
   config.tvShows,
   formatter,
-);
-export const sorter = new Sorter(
-  config.downloadsDir,
-  config.moviesDir,
-  mediaChecker,
-  formatter,
-  parentDirectories,
 );
 test("load fixtures", () => expect(true).toBe(true));

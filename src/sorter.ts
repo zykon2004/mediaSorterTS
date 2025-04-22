@@ -31,7 +31,7 @@ export class Sorter {
     this.moveUnassignedMediaToMovies();
     this.cleanupEmptyDirectories();
   }
-  private scanDownloads() {
+  public scanDownloads() {
     fs.readdirSync(this.downloadsDirectory).forEach((fileOrDirectory) => {
       if (this.mediaChecker.isDownloadedMediaFile(fileOrDirectory))
         this.mediaFiles.add(fileOrDirectory);
