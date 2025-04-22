@@ -35,10 +35,7 @@ export async function loadAppConfigFromRedis(): Promise<AppConfig> {
       torrentClientURL: rawConfig.torrent_url || "",
       torrentClientUsername: rawConfig.torrent_username || "",
       torrentClientPassword: rawConfig.torrent_password || "",
-      tvShows: rawTvShows.map((title) => ({
-        title: title,
-        path: path.join(rawConfig.tv_shows_dir || "", title),
-      })),
+      tvShows: rawTvShows,
       forbiddenPrefixes: rawForbiddenPrefixes || [],
     };
 

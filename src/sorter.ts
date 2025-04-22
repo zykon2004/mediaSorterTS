@@ -10,8 +10,8 @@ export class Sorter {
   mediaDirectories: Set<string> = new Set<string>();
   assignedFiles: Set<string> = new Set<string>();
   assignedDirectories: Set<string> = new Set<string>();
-  movedTvShowMediaCount: number = 0;
-  movedMovieMediaCount: number = 0;
+  public movedTvShowMediaCount: number = 0;
+  public movedMovieMediaCount: number = 0;
 
   constructor(
     readonly downloadsDirectory: string,
@@ -33,14 +33,15 @@ export class Sorter {
   }
   public scanDownloads() {
     fs.readdirSync(this.downloadsDirectory).forEach((fileOrDirectory) => {
-      if (this.mediaChecker.isDownloadedMediaFile(fileOrDirectory))
-        this.mediaFiles.add(fileOrDirectory);
-      else if (this.mediaChecker.isDownloadedMediaDirectory(fileOrDirectory))
-        this.mediaDirectories.add(fileOrDirectory);
+      const fileOrDirectoryFullPath = path.join(this.downloadsDirectory, fileOrDirectory);
+      if (this.mediaChecker.isDownloadedMediaFile(fileOrDirectoryFullPath))
+        this.mediaFiles.add(fileOrDirectoryFullPath);
+      else if (this.mediaChecker.isDownloadedMediaDirectory(fileOrDirectoryFullPath))
+        this.mediaDirectories.add(fileOrDirectoryFullPath);
     });
   }
 
-  private assignAllMediaToParents(): void {
+  public assignAllMediaToParents(): void {
     this.tvShowParentDirectories.forEach((parentDirectory) => {
       this.assignFilesToParents(parentDirectory);
       this.assignDirectoriesToParents(parentDirectory);
@@ -68,19 +69,19 @@ export class Sorter {
       const formattedDirectoryName =
         this.formatter.formatTvShowTitleAndFileName(path.basename(directory));
       if (formattedDirectoryName.startsWith(parentDirectory.comparableName)) {
-        this.filesInsideDirectoryToParent(directory, parentDirectory);
+        this.assignFilesInsideDirectoryToParent(directory, parentDirectory);
         this.assignedDirectories.add(directory);
       }
     });
   }
 
-  private filesInsideDirectoryToParent(
+  private assignFilesInsideDirectoryToParent(
     directory: string,
     parentDirectory: ParentDirectory,
   ) {
     fs.readdirSync(directory).forEach((file) => {
       if (this.mediaChecker.isDownloadedMediaFile(path.basename(file))) {
-        parentDirectory.assignFile(file);
+        parentDirectory.assignFile(path.join(directory,file));
       }
     });
   }
@@ -112,7 +113,7 @@ export class Sorter {
     logger.info(`Moved ${this.movedMovieMediaCount} to movies directories`);
   }
 
-  private isAllDownloadedMediaAssigned(): boolean {
+  public isAllDownloadedMediaAssigned(): boolean {
     return (
       this.unassignedMediaFiles.size === 0 &&
       this.unassignedMediaDirectories.size === 0
@@ -125,7 +126,7 @@ export class Sorter {
     );
   }
 
-  private get unassignedMediaFiles(): Set<string> {
+  public get unassignedMediaFiles(): Set<string> {
     return new Set(this.mediaFiles).difference(new Set(this.assignedFiles));
   }
 
@@ -137,7 +138,7 @@ export class Sorter {
 
   private cleanupEmptyDirectories() {
     this.assignedDirectories.forEach((directory) => {
-      fs.rmdirSync(directory);
+      fs.rmSync(directory, {recursive: true});
       logger.info(`Deleted ${directory}`);
     });
   }

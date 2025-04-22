@@ -1,6 +1,7 @@
 import { Formatter } from "./formatter.ts";
 import path from "path";
 import { TVShow } from "./AppConfig.ts";
+import fs from "fs";
 
 export class ParentDirectory {
   public newlyAssignedFiles: Set<string> = new Set();
@@ -10,6 +11,7 @@ export class ParentDirectory {
     readonly directoryPath: string,
     readonly formatter: Formatter,
   ) {
+    fs.mkdirSync(this.directoryPath, {recursive: true});
     this.comparableName = this.formatter.formatTvShowTitleAndFileName(
       path.basename(this.directoryPath),
     );
@@ -29,7 +31,6 @@ export class ParentDirectory {
 }
 
 export function createParentTvShowDirectories(
-  tvShowRootDirectory: string,
   tvShows: TVShow[],
   formatter: Formatter,
 ): ParentDirectory[] {

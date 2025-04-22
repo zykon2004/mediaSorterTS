@@ -15,6 +15,6 @@ export interface AppConfig {
   torrentClientURL: string;
   torrentClientUsername: string;
   torrentClientPassword: string;
-  tvShows: TVShow[];
+  tvShows: string[];
   forbiddenPrefixes: string[];
 }
