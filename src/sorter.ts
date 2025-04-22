@@ -10,24 +10,19 @@ export class Sorter {
   mediaDirectories: Set<string> = new Set<string>();
   assignedFiles: Set<string> = new Set<string>();
   assignedDirectories: Set<string> = new Set<string>();
-  movedSeriesMediaCount: number = 0;
+  movedTvShowMediaCount: number = 0;
   movedMovieMediaCount: number = 0;
 
   constructor(
-    readonly DownloadsDirectory: string,
+    readonly downloadsDirectory: string,
     readonly moviesDirectory: string,
     readonly mediaChecker: MediaChecker,
     readonly formatter: Formatter,
-    readonly seriesParentDirectories: ParentDirectory[],
-  ) {
-    fs.readdirSync(this.DownloadsDirectory).forEach((fileOrDirectory) => {
-      if (this.mediaChecker.isDownloadedMediaFile(fileOrDirectory))
-        this.mediaFiles.add(fileOrDirectory);
-      else if (this.mediaChecker.isDownloadedMediaDirectory(fileOrDirectory))
-        this.mediaDirectories.add(fileOrDirectory);
-    });
-  }
+    readonly tvShowParentDirectories: ParentDirectory[],
+  ) {}
+
   public sort(): void {
+    this.scanDownloads();
     this.assignAllMediaToParents();
     if (this.assignedDirectories.union(this.assignedFiles).size === 0) {
       logger.info("Nothing to assign");
@@ -36,15 +31,24 @@ export class Sorter {
     this.moveUnassignedMediaToMovies();
     this.cleanupEmptyDirectories();
   }
+  private scanDownloads() {
+    fs.readdirSync(this.downloadsDirectory).forEach((fileOrDirectory) => {
+      if (this.mediaChecker.isDownloadedMediaFile(fileOrDirectory))
+        this.mediaFiles.add(fileOrDirectory);
+      else if (this.mediaChecker.isDownloadedMediaDirectory(fileOrDirectory))
+        this.mediaDirectories.add(fileOrDirectory);
+    });
+  }
+
   private assignAllMediaToParents(): void {
-    this.seriesParentDirectories.forEach((parentDirectory) => {
+    this.tvShowParentDirectories.forEach((parentDirectory) => {
       this.assignFilesToParents(parentDirectory);
       this.assignDirectoriesToParents(parentDirectory);
     });
   }
   private assignFilesToParents(parentDirectory: ParentDirectory) {
     this.mediaFiles.forEach((file) => {
-      const formattedFileName = this.formatter.formatSeriesTitleAndFileName(
+      const formattedFileName = this.formatter.formatTvShowTitleAndFileName(
         path.basename(file),
       );
       if (formattedFileName.startsWith(parentDirectory.comparableName)) {
@@ -62,7 +66,7 @@ export class Sorter {
   private assignDirectoriesToParents(parentDirectory: ParentDirectory): void {
     this.mediaDirectories.forEach((directory) => {
       const formattedDirectoryName =
-        this.formatter.formatSeriesTitleAndFileName(path.basename(directory));
+        this.formatter.formatTvShowTitleAndFileName(path.basename(directory));
       if (formattedDirectoryName.startsWith(parentDirectory.comparableName)) {
         this.filesInsideDirectoryToParent(directory, parentDirectory);
         this.assignedDirectories.add(directory);
@@ -82,15 +86,15 @@ export class Sorter {
   }
 
   private moveAllMediaToAssignedParents(): void {
-    this.seriesParentDirectories.forEach((parentDirectory) => {
+    this.tvShowParentDirectories.forEach((parentDirectory) => {
       parentDirectory.newlyAssignedFiles.forEach((file) => {
         const dst = parentDirectory.resolveNewFilePath(file);
         this.move(file, dst);
-        this.movedSeriesMediaCount++;
+        this.movedTvShowMediaCount++;
       });
     });
     logger.info(
-      `Moved ${this.movedSeriesMediaCount} files to series directories`,
+      `Moved ${this.movedTvShowMediaCount} files to TV show directories`,
     );
   }
 

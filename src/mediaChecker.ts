@@ -1,4 +1,3 @@
-import type { AppConfig } from "./AppConfig";
 import { Formatter, SeasonEpisodePatternNotFound } from "./formatter";
 import path from "path";
 import fs from "fs";
@@ -39,13 +38,13 @@ export class MediaChecker {
     return hasDownloadedIndicator && containsMediaFiles;
   }
 
-  isSeriesFile(file: string): boolean {
+  isTvShowFile(file: string): boolean {
     if (!this.isDownloadedMediaFile(file)) {
       return false;
     }
 
     try {
-      this.formatter.extractSeasonAndEpisodeFromSeriesFilename(path.basename(file));
+      this.formatter.extractSeasonAndEpisodeFromTvShowFilename(path.basename(file));
       return true;
     } catch (error) {
       if (error instanceof SeasonEpisodePatternNotFound) {

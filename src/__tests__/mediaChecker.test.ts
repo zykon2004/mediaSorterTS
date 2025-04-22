@@ -3,7 +3,7 @@ import fs from "fs";
 import {
   config,
   downloadedMediaIndicator,
-  mediaFile,
+  mediaChecker,
   mediaFileSuffix,
 } from "./fixtures.ts";
 import * as os from "node:os";
@@ -26,7 +26,7 @@ describe("isDownloadedMediaFile", () => {
       false,
     ],
   ])("%s", (_testId: string, filename: string, expectedResult: boolean) => {
-    expect(mediaFile.isDownloadedMediaFile(filename)).toBe(expectedResult);
+    expect(mediaChecker.isDownloadedMediaFile(filename)).toBe(expectedResult);
   });
 });
 
@@ -41,7 +41,7 @@ describe("isDownloadedMediaDirectory", () => {
   beforeAll(() => {
     const tempDirPrefix = path.join(os.tmpdir(), "mediaFile-test-");
     tempTestDir = fs.mkdtempSync(tempDirPrefix);
-    // Counts as a series directory
+    // Counts as a TV show directory
     const downloadedMediaDirectory = `The.Mandalorian.S02E02.Chapter.10.${downloadedMediaIndicator}.WEB-DL.DDP.5.1.Atmos.H.264-PHOENIX`;
     mandalorianDirectoryPath = path.join(
       tempTestDir,
@@ -113,22 +113,22 @@ describe("isDownloadedMediaDirectory", () => {
     }
   });
   test("finds downloaded file in directory", () => {
-    expect(mediaFile.isDownloadedMediaDirectory(mandalorianDirectoryPath)).toBe(
+    expect(mediaChecker.isDownloadedMediaDirectory(mandalorianDirectoryPath)).toBe(
       true,
     );
   });
   test("downloaded app directory is not recognized as downloaded media directory", () => {
-    expect(mediaFile.isDownloadedMediaDirectory(appDirectoryPath)).toBe(false);
+    expect(mediaChecker.isDownloadedMediaDirectory(appDirectoryPath)).toBe(false);
   });
 
   test("personal media folder is not recognized as downloaded media", () => {
     expect(
-      mediaFile.isDownloadedMediaDirectory(personalMediaDirectoryPath),
+      mediaChecker.isDownloadedMediaDirectory(personalMediaDirectoryPath),
     ).toBe(false);
   });
 });
 
-describe("isSeriesFile", () => {
+describe("isTvShowFile", () => {
   test.each<[string, string, boolean]>([
     [
       "A file downloaded file containing s02e02 pattern",
@@ -136,7 +136,7 @@ describe("isSeriesFile", () => {
       true,
     ],
     [
-      "Downloaded media, but not a series",
+      "Downloaded media, but not a TV show",
       `The.Ministry.of.Ungentlemanly.Warfare.2024.${downloadedMediaIndicator}.AMAZON.WEBRip.1400MB-GalaxyRG${mediaFileSuffix}`,
       false,
     ],
@@ -144,6 +144,6 @@ describe("isSeriesFile", () => {
     ["Not a downloaded file", `Our Wedding 2019${mediaFileSuffix}`, false],
   ])("%s", (_testId: string, filename: string, expectedResult: boolean) => {
     // Configure the test with proper media indicators and suffixes
-    expect(mediaFile.isSeriesFile(filename)).toBe(expectedResult);
+    expect(mediaChecker.isTvShowFile(filename)).toBe(expectedResult);
   });
 });

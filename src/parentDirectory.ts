@@ -10,14 +10,14 @@ export class ParentDirectory {
     readonly directoryPath: string,
     readonly formatter: Formatter,
   ) {
-    this.comparableName = this.formatter.formatSeriesTitleAndFileName(
+    this.comparableName = this.formatter.formatTvShowTitleAndFileName(
       path.basename(this.directoryPath),
     );
   }
   resolveNewFilePath(assignedFile: string): string {
     return path.join(
       this.directoryPath,
-      this.formatter.formatSeriesFilenameBeforeRename(
+      this.formatter.formatTvShowFilenameBeforeRename(
         path.basename(assignedFile),
         path.basename(this.directoryPath),
       ),
@@ -28,8 +28,8 @@ export class ParentDirectory {
   }
 }
 
-function createParentSeriesDirectories(
-  seriesRootDirectory: string,
+export function createParentTvShowDirectories(
+  tvShowRootDirectory: string,
   tvShows: TVShow[],
   formatter: Formatter,
 ): ParentDirectory[] {

@@ -1,5 +1,3 @@
-import type { AppConfig } from "./AppConfig.ts";
-
 export class Formatter {
   escapeRegExp = (str: string) =>
     str.replace(/[.*+?^=!:${}()|[\]\/\\]/g, "\\$&");
@@ -15,7 +13,7 @@ export class Formatter {
     this.escapedSeparator = this.escapeRegExp(this.separator);
   }
 
-  formatSeriesTitleAndFileName(title: string): string {
+  formatTvShowTitleAndFileName(title: string): string {
     let formattedTitle = title.toLowerCase();
     formattedTitle = this.createUnifiedSeparator(formattedTitle);
     formattedTitle = this.removeForbiddenPrefixes(formattedTitle);
@@ -71,18 +69,18 @@ export class Formatter {
       .replace(trailingSeparatorRegex, "");
   }
   /**
-   * Extracts the season and episode numbers from a series filename.
+   * Extracts the season and episode numbers from a TV show filename.
    * Assumes the format "sXXeYY" case-insensitive.
    *
    * @param filename The input filename string.
    * @returns A tuple containing the season (two digits) and episode (two digits) as strings.
    * @throws SeasonEpisodePatternNotFound if the expected pattern is not found.
    */
-  extractSeasonAndEpisodeFromSeriesFilename(
+  extractSeasonAndEpisodeFromTvShowFilename(
     filename: string,
   ): [string, string] {
-    const seriesSeasonAndEpisodeRegex = /s(\d{2})e(\d{2})/i;
-    const match = filename.match(seriesSeasonAndEpisodeRegex);
+    const tvShowSeasonAndEpisodeRegex = /s(\d{2})e(\d{2})/i;
+    const match = filename.match(tvShowSeasonAndEpisodeRegex);
 
     if (match && match[1] && match[2]) {
       return [match[1], match[2]];
@@ -92,9 +90,9 @@ export class Formatter {
       `Didn't find SXXEYY pattern in ${filename}`,
     );
   }
-  formatSeriesFilenameBeforeRename(filename: string, title: string): string {
+  formatTvShowFilenameBeforeRename(filename: string, title: string): string {
     const [season, episode] =
-      this.extractSeasonAndEpisodeFromSeriesFilename(filename);
+      this.extractSeasonAndEpisodeFromTvShowFilename(filename);
     let formatedTitle = this.removeYearAndImdbSuffix(
       title,
       this.defaultTitleSeparator,

@@ -1,7 +1,7 @@
 import { SeasonEpisodePatternNotFound } from "../formatter.ts";
 import { formatter } from "./fixtures.ts";
 
-describe("formatSeriesTitleAndFileName", () => {
+describe("formatTvShowTitleAndFileName", () => {
   test.each([
     ["number is not removed since it is not a year", "Catch 22", "catch.22"],
     [
@@ -20,30 +20,30 @@ describe("formatSeriesTitleAndFileName", () => {
       "avatar.the.last.airbender",
     ],
     [
-      "series file name - lower, without `the`",
+      "TV show file name - lower, without `the`",
       "The.Mandalorian.S02E02.Chapter.10.1080p.DSNP.WEB-DL.DDP.5.1.Atmos.H.264-PHOENiX.mkv",
       "mandalorian.s02e02.chapter.10.1080p.dsnp.web-dl.ddp.5.1.atmos.h.264-phoenix.mkv",
     ],
     [
-      "series file name - lower, without `UIIndex`",
+      "TV show file name - lower, without `UIIndex`",
       "www.UIndex.org    -    Daredevil.Born.Again.S01E07.1080p.WEB.H264-SuccessfulCrab",
       "daredevil.born.again.s01e07.1080p.web.h264-successfulcrab",
     ],
     [
-      "series file name - lower, without `torrenting.com` and `The`",
+      "TV show file name - lower, without `torrenting.com` and `The`",
       "www.Torrenting.com - The Day Of The Jackal S01E10 1080p NOW WEB-DL DDP5 1 Atmos H 264-FLUX",
       "day.of.the.jackal.s01e10.1080p.now.web-dl.ddp5.1.atmos.h.264-flux",
     ],
     [
-      "series file name - lower, forbidden, unified",
+      "TV show file name - lower, forbidden, unified",
       "S.W.A.T.2017.S07E10.1080p_HDTV_;;x265-MiNX[TGx]",
       "s.w.a.t.2017.s07e10.1080p.hdtv.x265-minx[tgx]",
     ],
   ])('%s: formats "%s" to "%s"', (testId, title, formattedTitle) => {
-    expect(formatter.formatSeriesTitleAndFileName(title)).toBe(formattedTitle);
+    expect(formatter.formatTvShowTitleAndFileName(title)).toBe(formattedTitle);
   });
 });
-describe("formatSeriesFilenameBeforeRename", () => {
+describe("formatTvShowFilenameBeforeRename", () => {
   test.each([
     [
       "Normal case. prefix deleted, capitalized, episode and season extracted",
@@ -60,14 +60,14 @@ describe("formatSeriesFilenameBeforeRename", () => {
   ])(
     '%s: formats "%s", "%s" to "%s"',
     (testId, filename, title, expectedFilename) => {
-      expect(formatter.formatSeriesFilenameBeforeRename(filename, title)).toBe(
+      expect(formatter.formatTvShowFilenameBeforeRename(filename, title)).toBe(
         expectedFilename,
       );
     },
   );
 });
 
-describe("formatSeriesFilenameBeforeRename exception handling", () => {
+describe("formatTvShowFilenameBeforeRename exception handling", () => {
   test.each([
     [
       "No exception is raised. season, episode format found",
@@ -83,7 +83,7 @@ describe("formatSeriesFilenameBeforeRename exception handling", () => {
     ],
   ])("$id", (testId, filename, title, shouldThrow) => {
     const testFn = () => {
-      formatter.formatSeriesFilenameBeforeRename(filename, title);
+      formatter.formatTvShowFilenameBeforeRename(filename, title);
     };
 
     if (shouldThrow) {
@@ -96,7 +96,7 @@ describe("formatSeriesFilenameBeforeRename exception handling", () => {
     }
   });
 });
-describe("E2E Format Series Title and Filename", () => {
+describe("E2E Format TV Show Title and Filename", () => {
   test.each([
     [
       "mismatched title and filename",
@@ -111,8 +111,8 @@ describe("E2E Format Series Title and Filename", () => {
       true,
     ],
   ])("$id", (testId, title, filename, expectedResult) => {
-    const formattedTitle = formatter.formatSeriesTitleAndFileName(title);
-    const formattedFilename = formatter.formatSeriesTitleAndFileName(filename);
+    const formattedTitle = formatter.formatTvShowTitleAndFileName(title);
+    const formattedFilename = formatter.formatTvShowTitleAndFileName(filename);
     expect(formattedFilename.startsWith(formattedTitle)).toBe(expectedResult);
   });
 });
