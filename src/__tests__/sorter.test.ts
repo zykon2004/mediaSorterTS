@@ -118,14 +118,14 @@ describe("Sorter", () => {
       fs.rmSync(tempTestDir, { recursive: true, force: true });
     }
   });
-  test("scanDownloads", () => {
+  it("scans downloads", () => {
     sorter.scanDownloads();
     expect(sorter.mediaDirectories).toContain(mandalorianDirectoryPath);
     expect(sorter.mediaFiles).toContain(downloadedMediaFilePath);
     expect(sorter.mediaDirectories).toContain(aMovieDirectoryPath);
     expect(sorter.mediaDirectories).not.toContain(personalMediaDirectoryPath);
   });
-  test("AssignAllMediaToParents", () => {
+  it("assigns all media to parents", () => {
     let sumNewlyAssignedFiles = 0;
     sorter.scanDownloads();
     sorter.assignAllMediaToParents();
@@ -136,7 +136,7 @@ describe("Sorter", () => {
     expect(sorter.isAllDownloadedMediaAssigned()).toBe(false);
     expect(sorter.unassignedMediaFiles.size).toBe(1);
   });
-  test("sort", () => {
+  it("sorts media files", () => {
     loggerInfoSpy = jest.spyOn(logger, "info").mockImplementation(() => {});
     sorter.sort();
     expect(sorter.movedTvShowMediaCount).toBe(1);

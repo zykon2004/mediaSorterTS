@@ -10,7 +10,7 @@ import * as console from "node:console";
  * 
  * @jest-environment-flag ACCEPTABLE_FAILURE
  */
-test('can load config from Redis', async () => {
+it('loads config from Redis', async () => {
   try {
     process.env.REDIS_URL = 'redis://192.168.1.99:6379/1';
     const config = await loadAppConfigFromRedis();

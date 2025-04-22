@@ -2,7 +2,7 @@ import { SeasonEpisodePatternNotFound } from "../formatter.ts";
 import { formatter } from "./fixtures.ts";
 
 describe("formatTvShowTitleAndFileName", () => {
-  test.each([
+  it.each([
     ["number is not removed since it is not a year", "Catch 22", "catch.22"],
     [
       "Removed `The`, lower, removed Year",
@@ -39,12 +39,12 @@ describe("formatTvShowTitleAndFileName", () => {
       "S.W.A.T.2017.S07E10.1080p_HDTV_;;x265-MiNX[TGx]",
       "s.w.a.t.2017.s07e10.1080p.hdtv.x265-minx[tgx]",
     ],
-  ])('%s: formats "%s" to "%s"', (testId, title, formattedTitle) => {
+  ])('%s: formats "%s" to "%s"', (_testId, title, formattedTitle) => {
     expect(formatter.formatTvShowTitleAndFileName(title)).toBe(formattedTitle);
   });
 });
 describe("formatTvShowFilenameBeforeRename", () => {
-  test.each([
+  it.each([
     [
       "Normal case. prefix deleted, capitalized, episode and season extracted",
       "The.Mandalorian.S02E02.Chapter.10.1080p.DSNP.WEB-DL.DDP.5.1.Atmos.H.264-PHOENiX.mkv",
@@ -59,7 +59,7 @@ describe("formatTvShowFilenameBeforeRename", () => {
     ],
   ])(
     '%s: formats "%s", "%s" to "%s"',
-    (testId, filename, title, expectedFilename) => {
+    (_testId, filename, title, expectedFilename) => {
       expect(formatter.formatTvShowFilenameBeforeRename(filename, title)).toBe(
         expectedFilename,
       );
@@ -68,7 +68,7 @@ describe("formatTvShowFilenameBeforeRename", () => {
 });
 
 describe("formatTvShowFilenameBeforeRename exception handling", () => {
-  test.each([
+  it.each([
     [
       "No exception is raised. season, episode format found",
       "The.Mandalorian.S02E02.Chapter.10.1080p.DSNP.WEB-DL.DDP.5.1.Atmos.H.264-PHOENiX.mkv",
@@ -81,7 +81,7 @@ describe("formatTvShowFilenameBeforeRename exception handling", () => {
       "S.W.A.T 2017",
       true,
     ],
-  ])("$id", (testId, filename, title, shouldThrow) => {
+  ])("$id", (_testId, filename, title, shouldThrow) => {
     const testFn = () => {
       formatter.formatTvShowFilenameBeforeRename(filename, title);
     };
@@ -97,7 +97,7 @@ describe("formatTvShowFilenameBeforeRename exception handling", () => {
   });
 });
 describe("E2E Format TV Show Title and Filename", () => {
-  test.each([
+  it.each([
     [
       "mismatched title and filename",
       "The Office tt0386676",
@@ -110,7 +110,7 @@ describe("E2E Format TV Show Title and Filename", () => {
       "The.Mandalorian.S02E02.Chapter.10.1080p.DSNP.WEB-DL.DDP.5.1.Atmos.H.264-PHOENiX.mkv",
       true,
     ],
-  ])("$id", (testId, title, filename, expectedResult) => {
+  ])("$id", (_testId, title, filename, expectedResult) => {
     const formattedTitle = formatter.formatTvShowTitleAndFileName(title);
     const formattedFilename = formatter.formatTvShowTitleAndFileName(filename);
     expect(formattedFilename.startsWith(formattedTitle)).toBe(expectedResult);

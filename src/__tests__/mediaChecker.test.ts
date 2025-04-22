@@ -9,7 +9,7 @@ import {
 import * as os from "node:os";
 
 describe("isDownloadedMediaFile", () => {
-  test.each<[string, string, boolean]>([
+  it.each<[string, string, boolean]>([
     [
       `A file ending with .mkv and contains ${downloadedMediaIndicator}`,
       `The.Mandalorian.S02E02.Chapter.10.${downloadedMediaIndicator}.WEB-DL.DDP.5.1.Atmos.H.264-PHOENIX${mediaFileSuffix}`,
@@ -112,16 +112,16 @@ describe("isDownloadedMediaDirectory", () => {
       fs.rmSync(tempTestDir, { recursive: true, force: true });
     }
   });
-  test("finds downloaded file in directory", () => {
+  it("finds downloaded file in directory", () => {
     expect(mediaChecker.isDownloadedMediaDirectory(mandalorianDirectoryPath)).toBe(
       true,
     );
   });
-  test("downloaded app directory is not recognized as downloaded media directory", () => {
+  it("doesn't recognize downloaded app directory as downloaded media directory", () => {
     expect(mediaChecker.isDownloadedMediaDirectory(appDirectoryPath)).toBe(false);
   });
 
-  test("personal media folder is not recognized as downloaded media", () => {
+  it("doesn't recognize personal media folder as downloaded media", () => {
     expect(
       mediaChecker.isDownloadedMediaDirectory(personalMediaDirectoryPath),
     ).toBe(false);
@@ -129,7 +129,7 @@ describe("isDownloadedMediaDirectory", () => {
 });
 
 describe("isTvShowFile", () => {
-  test.each<[string, string, boolean]>([
+  it.each([
     [
       "A file downloaded file containing s02e02 pattern",
       `The.Mandalorian.S02E02.Chapter.10.${downloadedMediaIndicator}.WEB-DL.DDP.5.1.Atmos.H.264-PHOENIX${mediaFileSuffix}`,

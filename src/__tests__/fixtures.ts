@@ -33,4 +33,4 @@ export const downloadedMediaIndicator = config
   .downloadedMediaIndicators[0] as string;
 export const mediaFileSuffix = config.mediaFileSuffixes[0] as string;
 
-test("load fixtures", () => expect(true).toBe(true));
+it("loads fixtures", () => expect(true).toBe(true));
