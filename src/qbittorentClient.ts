@@ -1,3 +1,5 @@
+import logger from "./logger.ts";
+
 export class QBittorrentClient {
   constructor(private baseUrl: string) {}
 
@@ -12,5 +14,6 @@ export class QBittorrentClient {
     const url = `${this.baseUrl}/api/v2/torrents/delete`;
     const postData = 'hashes=all&deleteFiles=false';
     await axios.post(url, postData);
+    logger.info("Cleared all downloaded torrents from client")
   }
 }
