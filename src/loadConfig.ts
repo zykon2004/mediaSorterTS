@@ -33,8 +33,6 @@ export async function loadAppConfigFromRedis(): Promise<AppConfig> {
       unifiedSeparator: rawConfig.unified_separator || "",
       forbiddenCharacters: rawConfig.forbidden_characters?.split(" ") || [],
       torrentClientURL: rawConfig.torrent_url || "",
-      torrentClientUsername: rawConfig.torrent_username || "",
-      torrentClientPassword: rawConfig.torrent_password || "",
       tvShows: rawTvShows,
       forbiddenPrefixes: rawForbiddenPrefixes || [],
     };

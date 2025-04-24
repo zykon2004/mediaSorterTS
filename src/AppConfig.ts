@@ -13,8 +13,6 @@ export interface AppConfig {
   unifiedSeparator: string;
   forbiddenCharacters: string[];
   torrentClientURL: string;
-  torrentClientUsername: string;
-  torrentClientPassword: string;
   tvShows: string[];
   forbiddenPrefixes: string[];
 }

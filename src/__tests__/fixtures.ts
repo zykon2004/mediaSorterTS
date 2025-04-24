@@ -13,8 +13,6 @@ export const config: AppConfig = {
   unifiedSeparator: ".",
   forbiddenCharacters: [";", ":"],
   torrentClientURL: "",
-  torrentClientUsername: "",
-  torrentClientPassword: "",
   tvShows: ["The Mandalorian tt8111088", "Game of Thrones 2011"],
   forbiddenPrefixes: ["www.UIndex.org    -    ", "www.Torrenting.com - "],
 };
