@@ -93,12 +93,12 @@ export class Formatter {
   formatTvShowFilenameBeforeRename(filename: string, title: string): string {
     const [season, episode] =
       this.extractSeasonAndEpisodeFromTvShowFilename(filename);
-    let formatedTitle = this.removeYearAndImdbSuffix(
+    let formattedTitle = this.removeYearAndImdbSuffix(
       title,
       this.defaultTitleSeparator,
     );
-    formatedTitle = this.removeForbiddenPrefixes(formatedTitle);
-    return `${formatedTitle} - ${season}x${episode}.${filename.split(".").at(-1)}`;
+    formattedTitle = this.removeForbiddenPrefixes(formattedTitle);
+    return `${formattedTitle} - ${season}x${episode}.${filename.split(".").at(-1)}`;
   }
 }
 export class SeasonEpisodePatternNotFound extends Error {
