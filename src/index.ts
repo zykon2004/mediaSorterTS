@@ -8,6 +8,14 @@ import path from "path";
 import type { TVShow } from "./AppConfig.ts";
 import logger from "./logger.ts";
 
+logger.info("@@@ STARTED: MediaSorterTS @@@");
+try {
+  await main();
+} catch (e) {
+  logger.error(e);
+}
+logger.info("@@@@ ENDED: MediaSorterTS @@@@");
+
 async function main() {
   const config = await loadAppConfigFromRedis();
   const qBittorrentClient = new QBittorrentClient(config.torrentClientURL);
@@ -58,13 +66,3 @@ async function main() {
   await qBittorrentClient.deleteAllCompletedTorrentsFromList();
   sorter.sort();
 }
-
-
-
-logger.info("@@@ STARTED: MediaSorterTS @@@");
-try {
-  await main();
-} catch (e) {
-  logger.error(e);
-}
-logger.info("@@@@ ENDED: MediaSorterTS @@@@");
