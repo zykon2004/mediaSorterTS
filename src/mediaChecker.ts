@@ -53,4 +53,11 @@ export class MediaChecker {
       throw error;
     }
   }
+  public isDirectoryExists(directory:string): boolean {
+    try {
+     return fs.statSync(directory).isDirectory();
+    } catch (e) {
+      return false;
+    }
+  }
 }

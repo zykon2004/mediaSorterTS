@@ -5,34 +5,15 @@ import { MediaChecker } from "./mediaChecker.ts";
 import { Sorter } from "./sorter.ts";
 import { createParentTvShowDirectories } from "./parentDirectory.ts";
 import path from "path";
-import type {TVShow} from "./AppConfig.ts";
-import * as process from "node:process";
-import fs from "fs";
+import type { TVShow } from "./AppConfig.ts";
 
-console.log("@@@ STARTED: MediaSorterTS @@@");
-try {
+async function main() {
   const config = await loadAppConfigFromRedis();
-  try{
-    fs.statSync(config.downloadsDir)
-  } catch (e) {
-    console.log(e)
-  }
-  console.log(config.downloadsDir);
-  if (!fs.statSync(config.downloadsDir).isDirectory()) {
-    console.error(`Downloads directory ${config.downloadsDir} does not exist`)
-  }
-  if (!fs.statSync(config.moviesDir).isDirectory()) {
-    console.error(`Movies directory ${config.moviesDir} does not exist`)
-  }
-  if (!fs.statSync(config.tvShowDir).isDirectory()) {
-    console.error(`TVShow directory ${config.tvShowDir} does not exist`)
-  }
   const qBittorrentClient = new QBittorrentClient(config.torrentClientURL);
-  if (!qBittorrentClient.isAllTorrentsCompleted()) {
+  if (!(await qBittorrentClient.isAllTorrentsCompleted())) {
     console.error("Torrent client is still downloading. Exiting...");
-    process.exit(1);
+    return;
   }
-
   const formatter = new Formatter(
     config.forbiddenPrefixes,
     config.forbiddenCharacters,
@@ -44,6 +25,19 @@ try {
     config.mediaFileSuffixes,
     formatter,
   );
+  if (
+    [config.downloadsDir, config.tvShowDir, config.moviesDir].some(
+      (directory) => {
+        const isExists = mediaChecker.isDirectoryExists(directory);
+        if (!isExists) {
+          console.error(`Required directory: ${directory} does not exist`);
+        }
+        return !isExists;
+      },
+    )
+  ) {
+    return;
+  }
   const tvShowParentDirectories = createParentTvShowDirectories(
     config.tvShows.map((title) => {
       return {
@@ -62,7 +56,14 @@ try {
   );
   await qBittorrentClient.deleteAllTorrentsFromList();
   sorter.sort();
-} finally {
-  console.log("@@@@ ENDED: MediaSorterTS @@@@");
-  process.exit(0);
 }
+
+
+
+console.log("@@@ STARTED: MediaSorterTS @@@");
+try {
+  await main();
+} catch (e) {
+  console.error(e);
+}
+console.log("@@@@ ENDED: MediaSorterTS @@@@");

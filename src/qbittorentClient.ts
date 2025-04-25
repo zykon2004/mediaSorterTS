@@ -1,3 +1,4 @@
+import axios from 'axios';
 export class QBittorrentClient {
   constructor(private baseUrl: string) {}
 
