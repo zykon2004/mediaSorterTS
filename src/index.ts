@@ -54,7 +54,7 @@ async function main() {
     formatter,
     tvShowParentDirectories,
   );
-  await qBittorrentClient.deleteAllTorrentsFromList();
+  await qBittorrentClient.deleteAllCompletedTorrentsFromList();
   sorter.sort();
 }
 

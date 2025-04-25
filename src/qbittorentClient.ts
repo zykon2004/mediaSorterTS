@@ -9,7 +9,7 @@ export class QBittorrentClient {
     return Array.isArray(torrents) && torrents.length === 0;
   }
 
-  async deleteAllTorrentsFromList(): Promise<void> {
+  async deleteAllCompletedTorrentsFromList(): Promise<void> {
     const url = `${this.baseUrl}/api/v2/torrents/delete`;
     const postData = 'hashes=all&deleteFiles=false';
     await axios.post(url, postData);
