@@ -6,12 +6,13 @@ import { Sorter } from "./sorter.ts";
 import { createParentTvShowDirectories } from "./parentDirectory.ts";
 import path from "path";
 import type { TVShow } from "./AppConfig.ts";
+import logger from "./logger.ts";
 
 async function main() {
   const config = await loadAppConfigFromRedis();
   const qBittorrentClient = new QBittorrentClient(config.torrentClientURL);
   if (!(await qBittorrentClient.isAllTorrentsCompleted())) {
-    console.error("Torrent client is still downloading. Exiting...");
+    logger.error("Torrent client is still downloading. Exiting...");
     return;
   }
   const formatter = new Formatter(
@@ -30,7 +31,7 @@ async function main() {
       (directory) => {
         const isExists = mediaChecker.isDirectoryExists(directory);
         if (!isExists) {
-          console.error(`Required directory: ${directory} does not exist`);
+          logger.error(`Required directory: ${directory} does not exist`);
         }
         return !isExists;
       },
@@ -60,10 +61,10 @@ async function main() {
 
 
 
-console.log("@@@ STARTED: MediaSorterTS @@@");
+logger.info("@@@ STARTED: MediaSorterTS @@@");
 try {
   await main();
 } catch (e) {
-  console.error(e);
+  logger.error(e);
 }
-console.log("@@@@ ENDED: MediaSorterTS @@@@");
+logger.info("@@@@ ENDED: MediaSorterTS @@@@");

@@ -1,5 +1,6 @@
 import type { AppConfig } from "./AppConfig.ts";
 import { createClient } from "redis";
+import logger from "./logger.ts";
 
 export async function loadAppConfigFromRedis(): Promise<AppConfig> {
   const client = createClient({ url: process.env.REDIS_URL });
@@ -32,10 +33,10 @@ export async function loadAppConfigFromRedis(): Promise<AppConfig> {
       forbiddenPrefixes: rawForbiddenPrefixes || [],
     };
 
-    console.log("Loaded config from Redis");
+    logger.info("Loaded config from Redis");
     return loadedData;
   } catch (error) {
-    console.error("Error loading configuration from Redis:", error);
+    logger.error("Error loading configuration from Redis:", error);
     throw error; // Re-throw the error for the caller to handle
   } finally {
     // Ensure the client disconnects even if an error occurs
