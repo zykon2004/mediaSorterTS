@@ -1,11 +1,13 @@
 {
   "name": "media-sorter-ts",
-  "module": "index.ts",
+  "module": "src/index.ts",
   "type": "module",
   "private": true,
   "scripts": {
+    "start": "tsx --env-file=.env src/index.ts",
     "test": "jest",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "check": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",
@@ -22,7 +24,6 @@
   },
   "dependencies": {
     "axios": "^1.8.4",
-    "log4js": "^6.9.1",
     "redis": "^4.7.0"
   }
 }

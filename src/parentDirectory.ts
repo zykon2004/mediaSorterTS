@@ -1,6 +1,6 @@
 import { Formatter } from "./formatter.ts";
 import path from "path";
-import { TVShow } from "./AppConfig.ts";
+import type {TVShow} from "./AppConfig.ts";
 import fs from "fs";
 
 export class ParentDirectory {

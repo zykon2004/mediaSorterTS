@@ -1,7 +1,6 @@
 import { ParentDirectory } from "./parentDirectory.ts";
 import fs from "fs";
 import { MediaChecker } from "./mediaChecker.ts";
-import logger from "./logger.ts";
 import path from "path";
 import { Formatter } from "./formatter.ts";
 
@@ -25,7 +24,7 @@ export class Sorter {
     this.scanDownloads();
     this.assignAllMediaToParents();
     if (this.assignedDirectories.union(this.assignedFiles).size === 0) {
-      logger.info("Nothing to assign");
+      console.log("Nothing to assign");
     }
     this.moveAllMediaToAssignedParents();
     this.moveUnassignedMediaToMovies();
@@ -94,14 +93,14 @@ export class Sorter {
         this.movedTvShowMediaCount++;
       });
     });
-    logger.info(
+    console.log(
       `Moved ${this.movedTvShowMediaCount} files to TV show directories`,
     );
   }
 
   private move(src: string, dst: string) {
     fs.renameSync(src, dst);
-    logger.info(`Moved: ${src}\nTo: ${dst}`);
+    console.log(`Moved: ${src}\nTo: ${dst}`);
   }
 
   private moveUnassignedMediaToMovies() {
@@ -110,7 +109,7 @@ export class Sorter {
       .forEach((fileOrFolder) => {
         this.moveToMovies(fileOrFolder);
       });
-    logger.info(`Moved ${this.movedMovieMediaCount} to movies directories`);
+    console.log(`Moved ${this.movedMovieMediaCount} to movies directories`);
   }
 
   public isAllDownloadedMediaAssigned(): boolean {
@@ -139,7 +138,7 @@ export class Sorter {
   private cleanupEmptyDirectories() {
     this.assignedDirectories.forEach((directory) => {
       fs.rmSync(directory, {recursive: true});
-      logger.info(`Deleted ${directory}`);
+      console.log(`Deleted ${directory}`);
     });
   }
 }

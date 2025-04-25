@@ -1,4 +1,4 @@
-import { Formatter, SeasonEpisodePatternNotFound } from "./formatter";
+import { Formatter, SeasonEpisodePatternNotFound } from "./formatter.ts";
 import path from "path";
 import fs from "fs";
 

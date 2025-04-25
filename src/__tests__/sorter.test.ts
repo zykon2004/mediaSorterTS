@@ -10,8 +10,8 @@ import fs from "fs";
 import path from "path";
 import os from "node:os";
 import { createParentTvShowDirectories } from "../parentDirectory.ts";
-import { TVShow } from "../AppConfig.ts";
-import logger from "../logger.ts";
+import type {TVShow} from "../AppConfig.ts";
+import * as console from "node:console";
 
 describe("Sorter", () => {
   let tempTestDir: string;
@@ -137,7 +137,7 @@ describe("Sorter", () => {
     expect(sorter.unassignedMediaFiles.size).toBe(1);
   });
   it("sorts media files", () => {
-    loggerInfoSpy = jest.spyOn(logger, "info").mockImplementation(() => {});
+    loggerInfoSpy = jest.spyOn(global.console, "log").mockImplementation(() => {});
     sorter.sort();
     expect(sorter.movedTvShowMediaCount).toBe(1);
     expect(sorter.movedMovieMediaCount).toBe(2);

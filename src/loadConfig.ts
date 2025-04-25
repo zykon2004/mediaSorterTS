@@ -1,15 +1,10 @@
-import path from "path";
 import type { AppConfig } from "./AppConfig.ts";
 import { createClient } from "redis";
 
 export async function loadAppConfigFromRedis(): Promise<AppConfig> {
-  console.log("Starting asynchronous configuration loading from Redis...");
-
   const client = createClient({ url: process.env.REDIS_URL });
   try {
     await client.connect();
-    console.log("Redis client connected.");
-
     const rawConfig = await client.hGetAll("media_sorter_config");
     const rawTvShows = await client.lRange(
       "media_sorter_config:tv_shows",
@@ -37,7 +32,7 @@ export async function loadAppConfigFromRedis(): Promise<AppConfig> {
       forbiddenPrefixes: rawForbiddenPrefixes || [],
     };
 
-    console.log("Async config loading complete.");
+    console.log("Loaded config from Redis");
     return loadedData;
   } catch (error) {
     console.error("Error loading configuration from Redis:", error);
@@ -46,7 +41,6 @@ export async function loadAppConfigFromRedis(): Promise<AppConfig> {
     // Ensure the client disconnects even if an error occurs
     if (client.isOpen) {
       await client.disconnect();
-      console.log("Redis client disconnected.");
     }
   }
 }
