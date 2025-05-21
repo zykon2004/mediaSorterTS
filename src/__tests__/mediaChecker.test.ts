@@ -5,8 +5,14 @@ import {
   downloadedMediaIndicator,
   mediaChecker,
   mediaFileSuffix,
+  formatter, // Added formatter
 } from "./fixtures.ts";
 import * as os from "node:os";
+import * as readlineSync from 'readline-sync'; // Added readlineSync
+import { MediaChecker } from "../mediaChecker.ts"; // Added MediaChecker
+
+// Mock readline-sync
+jest.mock('readline-sync');
 
 describe("isDownloadedMediaFile", () => {
   it.each<[string, string, boolean]>([
@@ -125,6 +131,114 @@ describe("isDownloadedMediaDirectory", () => {
     expect(
       mediaChecker.isDownloadedMediaDirectory(personalMediaDirectoryPath),
     ).toBe(false);
+  });
+});
+
+// New test suite for user prompt scenario
+describe("isDownloadedMediaDirectory - User Prompt Scenario", () => {
+  let tempTestDir: string;
+  let mediaCheckerInstance: MediaChecker;
+  const mockDownloadedMediaIndicator = "[DOWNLOADED]";
+  const mockMediaFileSuffixes = [".mkv", ".mp4"];
+
+  beforeEach(() => {
+    // Create a temporary directory for testing
+    const tempDirPrefix = path.join(os.tmpdir(), "mediaChecker-prompt-test-");
+    tempTestDir = fs.mkdtempSync(tempDirPrefix);
+
+    mediaCheckerInstance = new MediaChecker(
+      [mockDownloadedMediaIndicator],
+      mockMediaFileSuffixes,
+      formatter,
+    );
+  });
+
+  afterEach(() => {
+    // Clean up the temporary directory after each test
+    if (tempTestDir) {
+      fs.rmSync(tempTestDir, { recursive: true, force: true });
+    }
+    jest.clearAllMocks(); // Clear mocks after each test
+  });
+
+  it("should return false when user chooses to delete the directory (Option 1)", () => {
+    const directoryName = `Test Series S01E01 ${mockDownloadedMediaIndicator}`;
+    const testDirPath = path.join(tempTestDir, directoryName);
+    fs.mkdirSync(testDirPath);
+
+    (readlineSync.question as jest.Mock).mockReturnValue("1");
+
+    const result = mediaCheckerInstance.isDownloadedMediaDirectory(testDirPath);
+    expect(result).toBe(false);
+    expect(readlineSync.question).toHaveBeenCalledTimes(1);
+  });
+
+  it("should return true when user chooses Option 2 and 'S01E02' file exists", () => {
+    const directoryName = `Test Series S01E01 ${mockDownloadedMediaIndicator}`;
+    const testDirPath = path.join(tempTestDir, directoryName);
+    fs.mkdirSync(testDirPath);
+
+    const mediaFileName = "test_S01E02_episode.mkv";
+    fs.writeFileSync(path.join(testDirPath, mediaFileName), "dummy content");
+
+    (readlineSync.question as jest.Mock).mockReturnValue("2");
+
+    const result = mediaCheckerInstance.isDownloadedMediaDirectory(testDirPath);
+    expect(result).toBe(true);
+    expect(readlineSync.question).toHaveBeenCalledTimes(1);
+  });
+
+  it("should return false when user chooses Option 2 and no 'S01E02' file exists", () => {
+    const directoryName = `Test Series S01E01 ${mockDownloadedMediaIndicator}`;
+    const testDirPath = path.join(tempTestDir, directoryName);
+    fs.mkdirSync(testDirPath);
+
+    // Add a non-matching file
+    fs.writeFileSync(path.join(testDirPath, "another_file.txt"), "dummy content");
+
+    (readlineSync.question as jest.Mock).mockReturnValue("2");
+
+    const result = mediaCheckerInstance.isDownloadedMediaDirectory(testDirPath);
+    expect(result).toBe(false);
+    expect(readlineSync.question).toHaveBeenCalledTimes(1);
+  });
+
+  it("should return true for a directory with media files (original behavior, no prompt)", () => {
+    const directoryName = `Test Series S01E02 ${mockDownloadedMediaIndicator}`;
+    const testDirPath = path.join(tempTestDir, directoryName);
+    fs.mkdirSync(testDirPath);
+
+    const mediaFileName = "episode.mkv";
+    fs.writeFileSync(path.join(testDirPath, mediaFileName), "dummy content");
+
+    const result = mediaCheckerInstance.isDownloadedMediaDirectory(testDirPath);
+    expect(result).toBe(true);
+    expect(readlineSync.question).not.toHaveBeenCalled();
+  });
+
+  it("should return false if directory name does not have downloaded indicator, even with media files", () => {
+    const directoryName = "Test Series S01E03"; // No indicator
+    const testDirPath = path.join(tempTestDir, directoryName);
+    fs.mkdirSync(testDirPath);
+
+    const mediaFileName = "episode.mkv";
+    fs.writeFileSync(path.join(testDirPath, mediaFileName), "dummy content");
+
+    const result = mediaCheckerInstance.isDownloadedMediaDirectory(testDirPath);
+    expect(result).toBe(false);
+    expect(readlineSync.question).not.toHaveBeenCalled();
+  });
+
+   it("should return false and not prompt if directory is not marked as downloaded and has no media files", () => {
+    const directoryName = "Another Series S01E01"; // No indicator
+    const testDirPath = path.join(tempTestDir, directoryName);
+    fs.mkdirSync(testDirPath);
+
+    (readlineSync.question as jest.Mock).mockReturnValue("1"); // Mock this just in case
+
+    const result = mediaCheckerInstance.isDownloadedMediaDirectory(testDirPath);
+    expect(result).toBe(false);
+    expect(readlineSync.question).not.toHaveBeenCalled();
   });
 });
 

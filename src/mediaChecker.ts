@@ -1,6 +1,7 @@
 import { Formatter, SeasonEpisodePatternNotFound } from "./formatter.ts";
 import path from "path";
 import fs from "fs";
+import * as readlineSync from 'readline-sync';
 
 export class MediaChecker {
   constructor(
@@ -31,9 +32,29 @@ export class MediaChecker {
     }
 
     const hasDownloadedIndicator = this.isDownloaded(path.basename(directory));
-    const containsMediaFiles = fs.readdirSync(directory).some((file) => {
-      return fs.statSync(path.join(directory, file)).isFile() && this.isMediaFile(file)
+    const files = fs.readdirSync(directory);
+    const containsMediaFiles = files.some((file) => {
+      const filePath = path.join(directory, file);
+      return fs.statSync(filePath).isFile() && this.isMediaFile(file);
     });
+
+    if (hasDownloadedIndicator && !containsMediaFiles) {
+      console.log(`Directory '${path.basename(directory)}' is marked as downloaded but contains no media files. How would you like to proceed?`);
+      const choice = readlineSync.question("1. Delete the directory.\n2. Treat files containing the pattern 'S01E02' as media files.\nChoose an option (1 or 2): ");
+
+      if (choice === '1') {
+        return false;
+      } else if (choice === '2') {
+        const containsPatternFiles = files.some((file) => {
+          const filePath = path.join(directory, file);
+          return fs.statSync(filePath).isFile() && file.includes('S01E02');
+        });
+        return containsPatternFiles;
+      } else {
+        console.log("Invalid choice. Proceeding as if no media files were found.");
+        return false;
+      }
+    }
 
     return hasDownloadedIndicator && containsMediaFiles;
   }
