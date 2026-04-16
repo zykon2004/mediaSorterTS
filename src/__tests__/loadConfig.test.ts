@@ -1,4 +1,5 @@
 import { loadAppConfigFromRedis } from "../loadConfig.ts";
+import { stripRedisCredentials } from "../loadConfig.ts";
 import logger from "../logger.ts";
 
 /**
@@ -11,7 +12,7 @@ import logger from "../logger.ts";
  */
 it("loads config from Redis", async () => {
   try {
-    process.env.REDIS_URL = "redis://192.168.1.99:6379/1";
+    process.env.REDIS_URL_R4K_DB = "redis://192.168.0.203:6379/1";
     const config = await loadAppConfigFromRedis();
     expect(config).toBeDefined();
     logger.info(config);
@@ -20,4 +21,10 @@ it("loads config from Redis", async () => {
       "Redis connection failed. This is expected in CI environment without Redis.",
     );
   }
+});
+
+it("strips Redis credentials while preserving host and db", () => {
+  expect(
+    stripRedisCredentials("redis://default:secret@192.168.0.203:6379/1"),
+  ).toBe("redis://192.168.0.203:6379/1");
 });

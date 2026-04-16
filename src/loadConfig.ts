@@ -2,10 +2,52 @@ import type { AppConfig } from "./AppConfig.ts";
 import { createClient } from "redis";
 import logger from "./logger.ts";
 
-export async function loadAppConfigFromRedis(): Promise<AppConfig> {
-  const client = createClient({ url: process.env.REDIS_URL });
+const AUTH_NOT_CONFIGURED_PATTERN =
+  /ERR AUTH .*without any password configured for the default user/i;
+
+export function stripRedisCredentials(redisUrl: string): string {
+  const parsedUrl = new URL(redisUrl);
+  parsedUrl.username = "";
+  parsedUrl.password = "";
+  return parsedUrl.toString();
+}
+
+function shouldRetryWithoutAuth(error: unknown): boolean {
+  return AUTH_NOT_CONFIGURED_PATTERN.test(String(error));
+}
+
+async function connectRedisClient(redisUrl: string) {
+  let client = createClient({ url: redisUrl });
   try {
     await client.connect();
+    await client.ping();
+    return client;
+  } catch (error) {
+    if (client.isOpen) {
+      await client.disconnect();
+    }
+    if (!shouldRetryWithoutAuth(error)) {
+      throw error;
+    }
+
+    logger.warn(
+      "Redis rejected AUTH for the default user; retrying without credentials from REDIS_URL_R4K_DB",
+    );
+
+    client = createClient({ url: stripRedisCredentials(redisUrl) });
+    await client.connect();
+    return client;
+  }
+}
+
+export async function loadAppConfigFromRedis(): Promise<AppConfig> {
+  const redisUrl = process.env.REDIS_URL_R4K_DB;
+  if (!redisUrl) {
+    throw new Error("REDIS_URL_R4K_DB is not set");
+  }
+
+  const client = await connectRedisClient(redisUrl);
+  try {
     const rawConfig = await client.hGetAll("media_sorter_config");
     const rawTvShows = await client.lRange(
       "media_sorter_config:tv_shows",
@@ -36,8 +78,7 @@ export async function loadAppConfigFromRedis(): Promise<AppConfig> {
     logger.info("Loaded config from Redis");
     return loadedData;
   } catch (error) {
-    logger.error("Error loading configuration from Redis:", error);
-    throw error; // Re-throw the error for the caller to handle
+    throw error;
   } finally {
     // Ensure the client disconnects even if an error occurs
     if (client.isOpen) {
